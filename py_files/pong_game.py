@@ -13,7 +13,8 @@ gameWindow = pygame.display.set_mode((width, height))
 back_ground = pygame.image.load("../Images/background.jpg")
 running = True
 
-# restart_button = button.Button()
+restart_image = pygame.image.load('../Images/restart.png').convert_alpha()
+restart_button = button.Button(325, 200, restart_image, 11)
 
 
 def create_Window(w, h, background):
@@ -100,19 +101,17 @@ def restart_Pong_Game(s1, s2, run, ball, rect1, rect2, xs, ys):
 
 
 def game_over(score1, score2):
-    # creating the button for restart
-
     if score1 < score2:
         default_font = pygame.font.get_default_font()
-        font = pygame.font.SysFont(default_font, 15)
+        font = pygame.font.SysFont(default_font, 30)
         winner = font.render('Player ' + str(2) + ' is the winner!', True, black)
     elif score2 < score1:
         default_font = pygame.font.get_default_font()
-        font = pygame.font.SysFont(default_font, 15)
+        font = pygame.font.SysFont(default_font, 30)
         winner = font.render('Player ' + str(1) + ' is the winner!', True, black)
     elif score1 == score2:
         default_font = pygame.font.get_default_font()
-        font = pygame.font.SysFont(default_font, 15)
+        font = pygame.font.SysFont(default_font, 30)
         winner = font.render('No winner!', True, black)
     return winner
 
@@ -137,16 +136,17 @@ def main(running):
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-            elif isgameover:
-                winner = game_over(score1, score2)
 
         default_font = pygame.font.get_default_font()
         font = pygame.font.SysFont(default_font, 15)
         score1_text = font.render('SCORE: ' + str(score1), True, black)
         score2_text = font.render('SCORE: ' + str(score2), True, black)
 
+        if isgameover:
+            winner = game_over(score1, score2)
+            gameWindow.blit(winner, (310, 160))
+            restart_button.draw(gameWindow)
         gameWindow.blit(score1_text, (20, 20))
-        # gameWindow.blit(winner, (200, 180))
         gameWindow.blit(score2_text, (width - 70, 20))
         pygame.draw.rect(gameWindow, "hotpink", rectangle1)
         pygame.draw.rect(gameWindow, "cyan", rectangle2)
