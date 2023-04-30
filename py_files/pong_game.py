@@ -1,5 +1,5 @@
-import random
 import pygame
+import button
 from pygame import QUIT
 
 # set the size of the window
@@ -12,6 +12,9 @@ black = (0, 0, 0)
 gameWindow = pygame.display.set_mode((width, height))
 back_ground = pygame.image.load("../Images/background.jpg")
 running = True
+
+# restart_button = button.Button()
+
 
 def create_Window(w, h, background):
     # initialize the pygame
@@ -56,6 +59,7 @@ def rectangle_Movement(key_Pressed, rect1, rect2):
 
 
 def move_Ball(ball, x_, y_, s1, s2, rect1, rect2):
+    gameover = False
     # sound of the ball
     ball_sound = pygame.mixer.Sound("../Sounds/ball_sound.mp3")
     # ball reaches the bottom of the window
@@ -68,9 +72,11 @@ def move_Ball(ball, x_, y_, s1, s2, rect1, rect2):
         ball_sound.play()
     # ball reaches the left side of the window
     elif ball.x <= 0:
+        gameover = True
         x_, y_ = 0, 0
     # ball reaches the right side of the window
     elif ball.x + ball_radius >= width:
+        gameover = True
         x_, y_ = 0, 0
         # if ball meets the rectangle1
     elif ball.x <= rectangle_width and ball.y + ball_radius >= rect1.y and ball.y - ball_radius <= rect1.y + rectangle_length:
@@ -84,7 +90,7 @@ def move_Ball(ball, x_, y_, s1, s2, rect1, rect2):
         x_ *= -2
         y_ += 2
         ball_sound.play()
-    return x_, y_, s1, s2
+    return x_, y_, s1, s2, gameover
 
 
 def restart_Pong_Game(s1, s2, run, ball, rect1, rect2, xs, ys):
@@ -92,10 +98,28 @@ def restart_Pong_Game(s1, s2, run, ball, rect1, rect2, xs, ys):
     ball, rect1, rect2, xs, ys, s1, s2 = obstacles()
     return run, ball, rect1, rect2, score1, score2, xs, ys
 
+
+def game_over(score1, score2):
+    # creating the button for restart
+
+    if score1 < score2:
+        default_font = pygame.font.get_default_font()
+        font = pygame.font.SysFont(default_font, 15)
+        winner = font.render('Player ' + str(2) + ' is the winner!', True, black)
+    elif score2 < score1:
+        default_font = pygame.font.get_default_font()
+        font = pygame.font.SysFont(default_font, 15)
+        winner = font.render('Player ' + str(1) + ' is the winner!', True, black)
+    elif score1 == score2:
+        default_font = pygame.font.get_default_font()
+        font = pygame.font.SysFont(default_font, 15)
+        winner = font.render('No winner!', True, black)
+    return winner
+
 #  main function
 def main(running):
     background = create_Window(width, height, back_ground)
-
+    winner = ''
     ball, rectangle1, rectangle2, x_speed, y_speed, score1, score2 = obstacles()
 
     # helps to keep showing the background on screen
@@ -103,7 +127,7 @@ def main(running):
         # gets the key
         keyPressed = pygame.key.get_pressed()
         rectangle_Movement(keyPressed, rectangle1, rectangle2)
-        x_speed, y_speed, score1, score2 = move_Ball(ball, x_speed, y_speed, score1, score2, rectangle1, rectangle2)
+        x_speed, y_speed, score1, score2, isgameover = move_Ball(ball, x_speed, y_speed, score1, score2, rectangle1, rectangle2)
 
         ball.x += x_speed
         ball.y += y_speed
@@ -113,13 +137,16 @@ def main(running):
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+            elif isgameover:
+                winner = game_over(score1, score2)
 
         default_font = pygame.font.get_default_font()
         font = pygame.font.SysFont(default_font, 15)
-        score1_text = font.render('SCORE: '+ str(score1), True, black)
-        score2_text = font.render('SCORE: '+ str(score2), True, black)
+        score1_text = font.render('SCORE: ' + str(score1), True, black)
+        score2_text = font.render('SCORE: ' + str(score2), True, black)
 
         gameWindow.blit(score1_text, (20, 20))
+        # gameWindow.blit(winner, (200, 180))
         gameWindow.blit(score2_text, (width - 70, 20))
         pygame.draw.rect(gameWindow, "hotpink", rectangle1)
         pygame.draw.rect(gameWindow, "cyan", rectangle2)

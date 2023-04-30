@@ -1,5 +1,5 @@
 import pygame
-import buttons
+import button
 import pong_game
 from pygame.locals import *
 
@@ -16,7 +16,7 @@ class App:
 
     def run(self):
         start_button_image = pygame.image.load('../Images/Start_button_green_arrow.svg.png').convert_alpha()
-        start_button = buttons.Button(200, 200, start_button_image, 11)
+        start_button = button.Button(200, 200, start_button_image, 11)
 
         while App.running:
             if start_button.draw(App.screen):
